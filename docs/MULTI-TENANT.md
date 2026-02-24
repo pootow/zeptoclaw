@@ -194,7 +194,7 @@ Each tenant can enable agent swarm delegation, allowing the lead agent to spawn 
     "roles": {
       "researcher": {
         "system_prompt": "You are a research specialist. Find information thoroughly.",
-        "tools": ["web_search", "web_fetch", "memory_search"]
+        "tools": ["web_search", "search_engine", "web_fetch", "memory_search"]
       },
       "writer": {
         "system_prompt": "You are a writing specialist. Draft clear, concise content.",

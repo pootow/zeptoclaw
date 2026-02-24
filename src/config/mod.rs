@@ -530,6 +530,14 @@ impl Config {
             self.tools.web.search.api_key = Some(val);
         }
 
+        // Search engine format (markdown|json)
+        if let Ok(val) = std::env::var("ZEPTOCLAW_TOOLS_SEARCH_ENGINE_FORMAT") {
+            let v = val.trim().to_ascii_lowercase();
+            if v == "markdown" || v == "json" {
+                self.tools.search_engine.format = v;
+            }
+        }
+
         if let Ok(val) = std::env::var("ZEPTOCLAW_TOOLS_WEB_SEARCH_MAX_RESULTS") {
             if let Ok(v) = val.parse::<u32>() {
                 self.tools.web.search.max_results = v.clamp(1, 10);

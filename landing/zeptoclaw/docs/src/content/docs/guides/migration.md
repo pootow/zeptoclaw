@@ -288,6 +288,7 @@ Most core tools have direct equivalents with slightly different names.
 | `write` | `write_file` | Same |
 | `edit` | `edit_file` | Same |
 | `web-search` | `web_search` | Brave API in both |
+| `search_engine` | `search_engine` | SearxNG-backed; supports `markdown` (default) and `json` outputs. Override with `ZEPTOCLAW_TOOLS_SEARCH_ENGINE_FORMAT`. |
 | `web-fetch` | `web_fetch` | Same |
 | `message` | `message` | Same |
 | `cron` | `cron` | Same |

@@ -65,7 +65,7 @@ Policy-based gating for sensitive tools:
   "approval": {
     "enabled": true,
     "require_approval": ["shell", "write_file", "delegate"],
-    "auto_approve": ["read_file", "memory", "web_search"]
+    "auto_approve": ["read_file", "memory", "web_search", "search_engine"]
   }
 }
 ```

@@ -1,6 +1,9 @@
 //! Interactive onboarding wizard (zeptoclaw onboard).
 
 use std::io::{self, Write};
+use std::time::Duration;
+
+use reqwest::Client;
 
 use anyhow::{Context, Result};
 
@@ -253,6 +256,9 @@ pub(crate) async fn cmd_onboard(full: bool) -> Result<()> {
         // Configure web search integration
         configure_web_search(&mut config)?;
 
+        // Configure SearxNG-backed search engine
+        configure_search_engine(&mut config).await?;
+
         // Configure memory behavior.
         configure_memory(&mut config)?;
 
@@ -335,6 +341,96 @@ fn configure_web_search(config: &mut Config) -> Result<()> {
             println!(
                 "  Default web_search max_results set to {}.",
                 config.tools.web.search.max_results
+            );
+        } else {
+            println!("  Invalid number. Keeping current value.");
+        }
+    }
+
+    Ok(())
+}
+
+/// Configure SearxNG-backed search engine (admin configured instance).
+async fn configure_search_engine(config: &mut Config) -> Result<()> {
+    println!();
+    println!("SearxNG Search Engine Setup");
+    println!("----------------------------");
+    println!("Enter the base URL for your SearxNG instance (e.g. https://search.example.com)");
+    println!("Press Enter to skip.");
+    println!("");
+    println!("Output format: tools.search_engine.format = \"markdown\" or \"json\" (default: markdown).\nOverride via env var: ZEPTOCLAW_TOOLS_SEARCH_ENGINE_FORMAT");
+
+    // Initial prompt
+    loop {
+        print!("Searx base URL: ");
+        io::stdout().flush()?;
+        let input = read_line()?;
+        let base = input.trim().to_string();
+        if base.is_empty() {
+            println!("  Skipped search engine setup.");
+            return Ok(());
+        }
+
+        // Validate by making a simple test query
+        let client = Client::builder()
+            .timeout(Duration::from_secs(10))
+            .build()
+            .unwrap_or_else(|_| Client::new());
+
+        let test_url = format!(
+            "{}/search?q={}&format=json",
+            base.trim_end_matches('/'),
+            "zeptoclaw_test"
+        );
+
+        match client.get(&test_url).send().await {
+            Ok(resp) if resp.status().is_success() => {
+                config.tools.search_engine.base_url = Some(base.clone());
+                println!("  SearxNG base URL validated and configured.");
+                break;
+            }
+            Ok(resp) => {
+                println!("  Validation request returned HTTP {}", resp.status());
+                // fallthrough to retry prompt
+            }
+            Err(e) => {
+                println!("  Failed to validate SearxNG base URL: {}", e);
+                // fallthrough to retry prompt
+            }
+        }
+
+        // Ask user to retry or give up
+        print!("Enter corrected base URL, or press Enter to give up: ");
+        io::stdout().flush()?;
+        let retry = read_line()?;
+        if retry.trim().is_empty() {
+            println!("  Giving up — search engine not configured.");
+            return Ok(());
+        }
+        // loop continues with new base value
+    }
+
+    // Optionally prompt for an API key (some deployments protect Searx behind a proxy)
+    print!("Enter optional authorization token/header value (or press Enter to skip): ");
+    io::stdout().flush()?;
+    let token = read_secret()?;
+    if !token.is_empty() {
+        config.tools.search_engine.api_key = Some(token);
+        println!("  Authorization token configured.");
+    }
+
+    print!(
+        "Default max results to include in summaries [current={}]: ",
+        config.tools.search_engine.max_results
+    );
+    io::stdout().flush()?;
+    let count = read_line()?;
+    if !count.is_empty() {
+        if let Ok(parsed) = count.parse::<u32>() {
+            config.tools.search_engine.max_results = parsed.clamp(1, 50);
+            println!(
+                "  Default max_results set to {}.",
+                config.tools.search_engine.max_results
             );
         } else {
             println!("  Invalid number. Keeping current value.");

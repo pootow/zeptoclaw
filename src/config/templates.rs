@@ -112,6 +112,7 @@ fn builtin_researcher() -> AgentTemplate {
         temperature: None,
         allowed_tools: Some(vec![
             "web_search".to_string(),
+            "search_engine".to_string(),
             "web_fetch".to_string(),
             "memory_search".to_string(),
             "memory_get".to_string(),

@@ -220,6 +220,7 @@ sandbox-bubblewrap = []
 [dev-dependencies]
 tokio-test = "0.4"
 mockall = "0.12"
+wiremock = "0.6"
 # Benchmarking framework
 criterion = { version = "0.5", features = ["async_tokio"] }
 

@@ -57,6 +57,18 @@ const TOOLS: &[ToolInfo] = &[
         config_hint: "Optional: Set tools.web.search.api_key for Brave Search",
     },
     ToolInfo {
+        name: "search_engine",
+        description: "Search using an admin-configured SearxNG instance (markdown/json, default: markdown)",
+        requires_config: true,
+        config_hint: "Set tools.search_engine.base_url and optionally tools.search_engine.format (env: ZEPTOCLAW_TOOLS_SEARCH_ENGINE_FORMAT)",
+    },
+    ToolInfo {
+        name: "search_engine",
+        description: "Search using an admin-configured SearxNG instance (markdown/json, default: markdown)",
+        requires_config: true,
+        config_hint: "Set tools.search_engine.base_url and optionally tools.search_engine.format (env: ZEPTOCLAW_TOOLS_SEARCH_ENGINE_FORMAT)",
+    },
+    ToolInfo {
         name: "web_fetch",
         description: "Fetch and extract content from URLs",
         requires_config: false,
@@ -190,6 +202,12 @@ async fn cmd_tools_info(name: String) -> Result<()> {
 fn is_tool_configured(config: &Config, name: &str) -> bool {
     match name {
         "web_search" => true, // Always available: Brave with key, DDG fallback without
+        "search_engine" => config
+            .tools
+            .search_engine
+            .base_url
+            .as_ref()
+            .is_some_and(|u| !u.trim().is_empty()),
         "whatsapp_send" => {
             config
                 .tools
@@ -254,7 +272,7 @@ mod tests {
 
     #[test]
     fn test_tools_list_count() {
-        assert_eq!(TOOLS.len(), 19);
+        assert_eq!(TOOLS.len(), 20);
     }
 
     #[test]

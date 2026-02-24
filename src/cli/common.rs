@@ -688,6 +688,20 @@ Enable runtime.allow_fallback_to_native to opt in to native fallback.",
         }
     }
 
+    // Register SearxNG-backed search engine tool (search_engine)
+    if tool_enabled("search_engine") {
+        if let Some(base) = config.tools.search_engine.base_url.as_deref() {
+            let base = base.trim();
+            if !base.is_empty() {
+                let api_key = config.tools.search_engine.api_key.as_deref();
+                let mut tool = zeptoclaw::tools::SearxSearchTool::new(base, api_key);
+                tool = tool.with_max_results(config.tools.search_engine.max_results as usize);
+                agent.register_tool(Box::new(tool)).await;
+                info!("Registered search_engine tool (SearxNG)");
+            }
+        }
+    }
+
     // Register PDF read tool — always available; extraction requires --features tool-pdf.
     if tool_enabled("pdf_read") {
         let workspace_str = config.workspace_path().to_string_lossy().into_owned();
@@ -696,7 +710,6 @@ Enable runtime.allow_fallback_to_native to opt in to native fallback.",
             .await;
         info!("Registered pdf_read tool");
     }
-
     // Register proactive messaging tool.
     if tool_enabled("message") {
         agent

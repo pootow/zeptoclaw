@@ -57,11 +57,55 @@ Search-and-replace edits on existing files.
 
 Search the web using the Brave Search API.
 
+Note: `web_search` uses the Brave Search API; the SearxNG-backed `search_engine` tool is a separate option that supports both Markdown and JSON outputs (default: markdown). See the `search_engine` entry for details and examples.
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `query` | string | Yes | Search query |
 
 **Security:** SSRF protection blocks requests to private IP ranges, IPv6 loopback, and non-HTTP schemes. DNS pinning prevents rebinding attacks.
+
+## search_engine
+
+Search using an admin-configured SearxNG instance. This tool supports two output formats controlled by the configuration key `tools.search_engine.format` (default: "markdown"). The value may be overridden via the environment variable `ZEPTOCLAW_TOOLS_SEARCH_ENGINE_FORMAT`.
+
+Behavior notes:
+
+- Default format: **markdown** — human-friendly result list suitable for display and summaries.
+- `json` format: returns a pruned JSON object derived from the raw Searx response. The following low-value fields are removed in the pruned JSON: `number_of_results`, `thumbnail`, `engine`, `template`, `parsed_url`, `priority`, `engines`, `positions`, `category`, and `unresponsive_engines`.
+- The `content` field from each Searx result is preserved verbatim (no sanitization/truncation) so long-form snippets remain intact.
+- Any `unresponsive_engines` entries reported by SearxNG are filtered out of the returned JSON.
+
+Example JSON output (pruned):
+
+```json
+{
+  "query": "rust async patterns",
+  "results": [
+    {
+      "title": "Asynchronous Programming in Rust",
+      "url": "https://doc.rust-lang.org/async-book/",
+      "snippet": "Learn about async/await, Futures, and executors...",
+      "content": "Full excerpt or snippet preserved verbatim from the page...",
+      "score": 0.92
+    }
+  ],
+  "pagination": { "page": 1, "per_page": 10 }
+}
+```
+
+Example Markdown output (default):
+
+```markdown
+- **Asynchronous Programming in Rust** — https://doc.rust-lang.org/async-book/
+
+  Learn about async/await, Futures, and executors...
+
+  > Full excerpt or snippet preserved verbatim from the page...
+
+```
+
+Security: results returned by `search_engine` are subject to the same SSRF and URL validation protections as other web tools. Use an admin-configured, well-maintained SearxNG instance for best results.
 
 ## web_fetch
 

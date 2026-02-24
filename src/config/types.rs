@@ -1243,6 +1243,8 @@ fn default_transcribe_model() -> String {
 pub struct ToolsConfig {
     /// Web tools configuration
     pub web: WebToolsConfig,
+    /// SearxNG-backed search engine configuration
+    pub search_engine: SearchEngineConfig,
     /// WhatsApp Cloud API tool configuration
     pub whatsapp: WhatsAppToolConfig,
     /// Google Sheets tool configuration
@@ -1288,6 +1290,54 @@ fn default_http_request_max_bytes() -> usize {
 pub struct WebToolsConfig {
     /// Web search configuration
     pub search: WebSearchConfig,
+}
+
+/// Search engine (SearxNG) tool configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SearchEngineConfig {
+    /// Base URL for the SearxNG instance (e.g., https://search.example.com)
+    #[serde(default)]
+    pub base_url: Option<String>,
+    /// Optional authorization token/header value if protected by reverse proxy
+    #[serde(default)]
+    pub api_key: Option<String>,
+    /// Maximum results to include in summaries
+    #[serde(default = "default_search_engine_max_results")]
+    pub max_results: u32,
+    /// Request timeout in seconds
+    #[serde(default = "default_search_engine_timeout_secs")]
+    pub timeout_secs: u64,
+    /// Whether the tool is enabled (registration still gated by CLI template/profile)
+    #[serde(default)]
+    pub enabled: bool,
+    /// Output format for the search tool: "markdown" or "json"
+    #[serde(default = "default_search_engine_format")]
+    pub format: String,
+}
+
+fn default_search_engine_max_results() -> u32 {
+    6
+}
+fn default_search_engine_timeout_secs() -> u64 {
+    15
+}
+
+fn default_search_engine_format() -> String {
+    "markdown".to_string()
+}
+
+impl Default for SearchEngineConfig {
+    fn default() -> Self {
+        Self {
+            base_url: None,
+            api_key: None,
+            max_results: default_search_engine_max_results(),
+            timeout_secs: default_search_engine_timeout_secs(),
+            enabled: false,
+            format: default_search_engine_format(),
+        }
+    }
 }
 
 /// Web search configuration

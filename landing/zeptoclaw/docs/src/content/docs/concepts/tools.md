@@ -35,6 +35,7 @@ ZeptoClaw ships with 29 built-in tools:
 | `list_files` | List directory contents |
 | `edit_file` | Search-and-replace edits |
 | `web_search` | Web search via Brave API |
+| `search_engine` | Search via admin-configured SearxNG (markdown/json, default: markdown) |
 | `web_fetch` | Fetch and parse web pages |
 | `http_request` | General-purpose HTTP client for arbitrary API calls |
 | `memory` | Search workspace memory (markdown files) |

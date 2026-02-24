@@ -80,6 +80,7 @@ mod registry;
 pub mod reminder;
 #[cfg(feature = "screenshot")]
 pub mod screenshot;
+pub mod search_engine;
 pub mod shell;
 pub mod skills_install;
 pub mod skills_search;
@@ -114,6 +115,7 @@ pub use skills_install::InstallSkillTool;
 pub use skills_search::FindSkillsTool;
 pub use stripe::StripeTool;
 pub use transcribe::TranscribeTool;
+pub use search_engine::SearxSearchTool;
 pub use types::{Tool, ToolCategory, ToolContext, ToolOutput};
 pub use web::{
     is_blocked_host, resolve_and_check_host, DdgSearchTool, WebFetchTool, WebSearchTool,

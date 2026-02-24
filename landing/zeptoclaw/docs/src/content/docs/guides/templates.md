@@ -76,9 +76,11 @@ Combine templates with the delegate tool's tool whitelist for controlled sub-age
   "name": "safe_researcher",
   "description": "Research-only agent (no shell or file writes)",
   "system_prompt": "You are a research assistant. Search the web and analyze information.",
-  "tools": ["web_search", "web_fetch", "memory", "longterm_memory"]
+  "tools": ["web_search", "search_engine", "web_fetch", "memory", "longterm_memory"]
 }
 ```
+
+Note: `web_search` uses Brave Search; `search_engine` queries an admin-configured SearxNG instance and supports `markdown` (default) and `json` output (override with `ZEPTOCLAW_TOOLS_SEARCH_ENGINE_FORMAT`).
 
 The agent using this template can only access the whitelisted tools.
 
